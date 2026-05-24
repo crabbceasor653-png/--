@@ -5,300 +5,703 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>植物猜猜猜</title>
 <style>
-  :root {
-    --green: #2E7D32;
-    --green-light: #4CAF50;
-    --green-bg: #E8F5E9;
-    --red: #E53935;
-    --red-light: #FFEBEE;
-    --gold: #FF8F00;
-    --white: #FFFFFF;
-    --gray: #9E9E9E;
-    --text: #263238;
-    --text-light: #607D8B;
-    --radius: 16px;
-    --shadow: 0 2px 16px rgba(0,0,0,0.08);
-  }
+/* ========================================
+   Botanical Field Journal — 植物标本馆
+   ======================================== */
+:root {
+  --cream: #FDF8F0;
+  --cream-dark: #EFE4D4;
+  --parchment: #F5EDDF;
+  --forest: #2C4A1E;
+  --forest-dark: #1A3010;
+  --olive: #4A6741;
+  --sage: #7B916E;
+  --moss: #A3B899;
+  --gold: #C4933A;
+  --gold-bright: #E2B94B;
+  --gold-pale: #F5E6C8;
+  --bark: #5D4037;
+  --bark-light: #8D6E63;
+  --berry: #9B2A3B;
+  --berry-light: #F5E6E8;
+  --success: #4A7C3F;
+  --success-light: #E8F0E4;
+  --text: #3E2723;
+  --text-light: #6D5D56;
+  --text-muted: #9B8B82;
+  --white: #FFFDF9;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --shadow-sm: 0 1px 4px rgba(46,30,20,0.06);
+  --shadow: 0 4px 20px rgba(46,30,20,0.10);
+  --shadow-lg: 0 8px 40px rgba(46,30,20,0.14);
+  --font-display: "STKaiti", "KaiTi", "楷体", "Noto Serif SC", serif;
+  --font-body: "PingFang SC", "Microsoft YaHei", "微软雅黑", sans-serif;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(170deg, #E8F5E9 0%, #C8E6C9 30%, #A5D6A7 60%, #81C784 100%);
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 12px;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-  }
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(175deg, #EDE3D3 0%, #E8DCC8 25%, #DDD0B8 50%, #D4C8AE 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
-  .container {
-    width: 100%;
-    max-width: 420px;
-    background: var(--white);
-    border-radius: 24px;
-    box-shadow: 0 8px 40px rgba(46,125,50,0.15);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 90vh;
-    min-height: 90dvh;
-    max-height: 95vh;
-    max-height: 95dvh;
-  }
+/* 背景纹理 — 仿纸张纤维 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,119,90,0.015) 2px, rgba(139,119,90,0.015) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(139,119,90,0.01) 3px, rgba(139,119,90,0.01) 6px);
+  pointer-events: none;
+  z-index: 0;
+}
 
-  /* ===== 顶部栏 ===== */
-  .header {
-    background: linear-gradient(135deg, #1B5E20, #2E7D32);
-    color: white;
-    padding: 16px 20px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-  .header h1 {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 2px;
-  }
-  .header h1 span { font-size: 26px; }
+/* ===== 容器 ===== */
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 0 1px rgba(180,160,130,0.15);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 88vh;
+  min-height: 88dvh;
+  max-height: 96vh;
+  max-height: 96dvh;
+}
 
-  .stats {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-top: 10px;
-    font-size: 14px;
-  }
-  .stat-item {
-    background: rgba(255,255,255,0.18);
-    border-radius: 20px;
-    padding: 4px 14px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .stat-value {
-    font-weight: 700;
-    font-size: 18px;
-    color: #FFD54F;
-  }
+/* ===== 顶部栏 ===== */
+.header {
+  background: linear-gradient(165deg, #1F3312 0%, #2C4A1E 40%, #3A5C2A 100%);
+  color: #FDF8F0;
+  padding: 18px 20px 16px;
+  text-align: center;
+  flex-shrink: 0;
+  position: relative;
+}
 
-  /* ===== 图片区域 ===== */
-  .image-area {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    background: #FAFAFA;
-    position: relative;
-    min-height: 200px;
-    overflow: hidden;
-  }
+/* 顶部装饰线 */
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226,185,75,0.45) 20%, rgba(226,185,75,0.6) 50%, rgba(226,185,75,0.45) 80%, transparent);
+}
 
-  .image-area img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    transition: opacity 0.3s, transform 0.3s;
-  }
-  .image-area img.loading {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  .image-area img.loaded {
-    opacity: 1;
-    transform: scale(1);
-  }
+.header h1 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  color: #FDF8F0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
 
-  .image-placeholder {
-    color: var(--gray);
-    font-size: 15px;
-    text-align: center;
-  }
-  .image-placeholder .icon { font-size: 64px; display: block; margin-bottom: 8px; }
+.header h1 .icon {
+  display: inline-block;
+  font-style: normal;
+  margin-right: 2px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
 
-  /* ===== 结果提示 ===== */
-  .result-banner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    padding: 16px 28px;
-    border-radius: 16px;
-    font-size: 18px;
-    font-weight: 700;
-    z-index: 10;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: none;
-    text-align: center;
-  }
-  .result-banner.show { transform: translate(-50%, -50%) scale(1); }
-  .result-banner.correct { background: #E8F5E9; color: #2E7D32; border: 3px solid #4CAF50; }
-  .result-banner.wrong { background: #FFEBEE; color: #C62828; border: 3px solid #E53935; }
+/* 头部三栏状态 */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 13px;
+}
 
-  /* ===== 选项区域 ===== */
-  .options-area {
-    padding: 16px;
-    flex-shrink: 0;
-    background: var(--white);
-  }
+.stat-item {
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 3px 13px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: rgba(253,248,240,0.75);
+}
 
-  .options-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
+.stat-value {
+  font-weight: 700;
+  font-size: 15px;
+  color: #E2B94B;
+}
 
-  .option-btn {
-    position: relative;
-    padding: 16px 8px;
-    font-size: 17px;
-    font-weight: 600;
-    border: 2px solid #E0E0E0;
-    border-radius: var(--radius);
-    background: var(--white);
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.2s;
-    min-height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    word-break: break-all;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-  }
-  .option-btn:active:not(.disabled) {
-    transform: scale(0.96);
-    background: #F5F5F5;
-  }
-  .option-btn.disabled {
-    pointer-events: none;
-    opacity: 0.7;
-  }
-  .option-btn.correct-answer {
-    border-color: #4CAF50 !important;
-    background: #E8F5E9 !important;
-    color: #2E7D32 !important;
-    opacity: 1 !important;
-    animation: pulse-green 0.6s ease;
-  }
-  .option-btn.wrong-answer {
-    border-color: #E53935 !important;
-    background: #FFEBEE !important;
-    color: #C62828 !important;
-    opacity: 1 !important;
-    animation: shake 0.5s ease;
-  }
+.stat-highlight {
+  font-weight: 700;
+  color: #FDF8F0;
+}
 
-  @keyframes pulse-green {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.04); }
-  }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
+/* ===== 图片区域 ===== */
+.image-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  background:
+    linear-gradient(180deg, #FAF7F2 0%, #F5EDDF 100%);
+  position: relative;
+  min-height: 180px;
+  overflow: hidden;
+}
 
-  /* ===== 下一题按钮 ===== */
-  .next-area {
-    padding: 0 16px 20px;
-    flex-shrink: 0;
-    display: flex;
-    justify-content: center;
-  }
+/* 图片区域装饰角标 */
+.image-area::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+  border-top: 1.5px solid rgba(180,160,130,0.25);
+  border-left: 1.5px solid rgba(180,160,130,0.25);
+  border-radius: 3px 0 0 0;
+  pointer-events: none;
+}
 
-  .next-btn {
-    display: none;
-    padding: 14px 48px;
-    font-size: 17px;
-    font-weight: 700;
-    color: white;
-    background: linear-gradient(135deg, #43A047, #2E7D32);
-    border: none;
-    border-radius: 28px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-    box-shadow: 0 4px 14px rgba(46,125,50,0.3);
-  }
-  .next-btn:active {
-    transform: scale(0.95);
-    box-shadow: 0 2px 8px rgba(46,125,50,0.2);
-  }
-  .next-btn.show { display: block; }
+.image-area::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border-bottom: 1.5px solid rgba(180,160,130,0.25);
+  border-right: 1.5px solid rgba(180,160,130,0.25);
+  border-radius: 0 0 3px 0;
+  pointer-events: none;
+}
 
-  /* ===== 加载/错误状态 ===== */
-  .error-state {
-    display: none;
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-light);
-  }
-  .error-state.show { display: block; }
-  .error-state .icon { font-size: 56px; display: block; margin-bottom: 12px; }
+.image-area img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(46,30,20,0.10);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
 
-  /* ===== 完成面板 ===== */
-  .finish-panel {
-    display: none;
-    text-align: center;
-    padding: 24px;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-  .finish-panel.show { display: flex; }
-  .finish-panel .icon { font-size: 72px; margin-bottom: 12px; }
-  .finish-panel h2 { font-size: 22px; color: var(--green); margin-bottom: 8px; }
-  .finish-panel .score-final { font-size: 48px; font-weight: 800; color: var(--gold); }
-  .finish-panel p { color: var(--text-light); margin: 8px 0 20px; }
-  .restart-btn {
-    padding: 14px 40px;
-    font-size: 16px;
-    font-weight: 700;
-    color: white;
-    background: linear-gradient(135deg, #43A047, #2E7D32);
-    border: none;
-    border-radius: 28px;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(46,125,50,0.3);
-  }
+.image-area img.loading {
+  opacity: 0;
+  transform: scale(0.94);
+}
 
-  /* ===== 响应式微调 ===== */
-  @media (min-width: 500px) {
-    .options-grid { gap: 14px; }
-    .option-btn { font-size: 18px; padding: 18px 10px; min-height: 60px; }
-  }
+.image-area img.loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.image-placeholder {
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+  font-family: var(--font-display);
+}
+
+.image-placeholder .ph-icon {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+/* ===== 结果横幅 ===== */
+.result-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 700;
+  z-index: 10;
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.result-banner.show { transform: translate(-50%, -50%) scale(1); }
+
+.result-banner.correct {
+  background: var(--success-light);
+  color: var(--success);
+  border: 2px solid rgba(74,124,63,0.3);
+  box-shadow: 0 4px 20px rgba(74,124,63,0.15);
+}
+
+.result-banner.wrong {
+  background: var(--berry-light);
+  color: var(--berry);
+  border: 2px solid rgba(155,42,59,0.25);
+  box-shadow: 0 4px 20px rgba(155,42,59,0.12);
+}
+
+/* ===== 选项区域 ===== */
+.options-area {
+  padding: 14px 16px;
+  flex-shrink: 0;
+  background: var(--white);
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.option-btn {
+  position: relative;
+  padding: 15px 8px;
+  font-size: 16px;
+  font-weight: 600;
+  border: 1.5px solid #DDD4C5;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, #FFFDF9 0%, #F8F3EA 100%);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  word-break: break-all;
+  font-family: var(--font-body);
+  letter-spacing: 0.5px;
+  outline: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.option-btn:active:not(.disabled) {
+  transform: scale(0.95);
+  background: #F0E8D8;
+  border-color: #C4B89A;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.option-btn.disabled {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.option-btn.correct-answer {
+  border-color: #4A7C3F !important;
+  background: #E8F0E4 !important;
+  color: #2D5016 !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 0 3px rgba(74,124,63,0.12) !important;
+  animation: pulse-green 0.6s ease;
+}
+
+.option-btn.wrong-answer {
+  border-color: #9B2A3B !important;
+  background: #F5E6E8 !important;
+  color: #8B1A2B !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 0 3px rgba(155,42,59,0.10) !important;
+  animation: shake 0.5s ease;
+}
+
+@keyframes pulse-green {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+/* ===== 下一题按钮 ===== */
+.next-area {
+  padding: 0 16px 18px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.next-btn {
+  display: none;
+  padding: 12px 44px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #FDF8F0;
+  background: linear-gradient(135deg, #3A5C2A, #2C4A1E);
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  font-family: var(--font-body);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(44,74,30,0.25);
+}
+
+.next-btn:active {
+  transform: scale(0.94);
+  box-shadow: 0 2px 8px rgba(44,74,30,0.18);
+}
+
+.next-btn.show { display: block; }
+
+/* ===== 关卡介绍覆盖层 ===== */
+.level-intro-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20,12,4,0.82);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  cursor: pointer;
+}
+
+.level-intro-overlay.show {
+  display: flex;
+  opacity: 1;
+}
+
+.level-intro-content {
+  text-align: center;
+  animation: intro-reveal 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.level-intro-deco {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226,185,75,0.7), transparent);
+  margin: 0 auto 20px;
+}
+
+.level-intro-deco-bottom {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226,185,75,0.7), transparent);
+  margin: 18px auto 0;
+}
+
+.level-intro-num {
+  font-family: var(--font-display);
+  font-size: 46px;
+  font-weight: 400;
+  color: #E2B94B;
+  letter-spacing: 6px;
+  text-shadow: 0 2px 16px rgba(226,185,75,0.35);
+}
+
+.level-intro-sub {
+  font-size: 17px;
+  color: rgba(253,248,240,0.75);
+  margin-top: 10px;
+  letter-spacing: 2px;
+}
+
+.level-intro-hint {
+  font-size: 13px;
+  color: rgba(253,248,240,0.35);
+  margin-top: 24px;
+  letter-spacing: 1px;
+  animation: hint-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes intro-reveal {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.7; }
+}
+
+/* ===== 关卡完成面板 ===== */
+.level-complete-panel {
+  display: none;
+  text-align: center;
+  padding: 28px 24px 20px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: var(--white);
+}
+
+.level-complete-panel.show { display: flex; }
+
+.level-complete-panel .lc-icon {
+  font-size: 44px;
+  margin-bottom: 4px;
+}
+
+.level-complete-panel h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--forest);
+  margin-bottom: 8px;
+  letter-spacing: 3px;
+  font-weight: 400;
+}
+
+.stars-display {
+  font-size: 48px;
+  margin: 10px 0 6px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  height: 56px;
+  align-items: center;
+}
+
+.stars-display .star {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.stars-display .star.filled {
+  animation: star-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  opacity: 0;
+  color: #E2B94B;
+}
+
+.stars-display .star.filled:nth-child(1) { animation-delay: 0.08s; }
+.stars-display .star.filled:nth-child(2) { animation-delay: 0.3s; }
+.stars-display .star.filled:nth-child(3) { animation-delay: 0.52s; }
+
+.stars-display .star.empty {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+
+@keyframes star-pop {
+  0% { opacity: 0; transform: scale(0) rotate(-25deg); }
+  55% { transform: scale(1.25) rotate(6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.level-result-text {
+  font-size: 16px;
+  color: var(--text-light);
+  margin: 10px 0 18px;
+  letter-spacing: 1px;
+}
+
+.lc-btn {
+  padding: 13px 42px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #FDF8F0;
+  background: linear-gradient(135deg, #3A5C2A, #2C4A1E);
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  font-family: var(--font-body);
+  box-shadow: 0 4px 16px rgba(44,74,30,0.25);
+  transition: all 0.2s ease;
+}
+
+.lc-btn:active {
+  transform: scale(0.94);
+}
+
+/* ===== 全部通关面板 ===== */
+.all-complete-panel {
+  display: none;
+  text-align: center;
+  padding: 24px 16px 20px;
+  flex: 1;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  background: var(--white);
+  overflow-y: auto;
+}
+
+.all-complete-panel.show { display: flex; }
+
+.all-complete-panel .ac-icon {
+  font-size: 56px;
+  margin-bottom: 2px;
+}
+
+.all-complete-panel h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--forest);
+  margin-bottom: 14px;
+  letter-spacing: 3px;
+  font-weight: 400;
+}
+
+/* 关卡总览网格 */
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 4px 0 14px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.level-bubble {
+  background: #FAF7F2;
+  border-radius: 10px;
+  padding: 10px 4px;
+  text-align: center;
+  font-size: 11px;
+  border: 1.5px solid #E8DDCD;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.level-bubble.best-3 {
+  border-color: #E2B94B;
+  background: linear-gradient(180deg, #FFFDF5 0%, #FDF3D5 100%);
+  box-shadow: 0 2px 8px rgba(226,185,75,0.15);
+}
+
+.level-bubble.best-2 {
+  border-color: #B0A090;
+  background: #F8F4EE;
+}
+
+.level-bubble.best-1 {
+  border-color: #C4B09A;
+  background: #F5F0E8;
+}
+
+.level-bubble.best-0 {
+  border-color: #E0D8C8;
+  opacity: 0.7;
+}
+
+.level-bubble .bubble-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--forest);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.level-bubble .bubble-stars {
+  font-size: 13px;
+  margin-top: 2px;
+  letter-spacing: 1px;
+}
+
+.level-bubble .bubble-stars .empty-star {
+  opacity: 0.35;
+}
+
+.total-score-text {
+  font-size: 14px;
+  color: var(--text-light);
+  margin: 6px 0 16px;
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+.ac-btn {
+  padding: 13px 36px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #FDF8F0;
+  background: linear-gradient(135deg, #3A5C2A, #2C4A1E);
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  font-family: var(--font-body);
+  box-shadow: 0 4px 16px rgba(44,74,30,0.25);
+  transition: all 0.2s ease;
+}
+
+.ac-btn:active {
+  transform: scale(0.94);
+}
+
+/* ===== 错误状态 ===== */
+.error-state {
+  display: none;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: var(--white);
+}
+
+.error-state.show { display: flex; }
+
+.error-state .err-icon {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* ===== 响应式 ===== */
+@media (min-width: 500px) {
+  .options-grid { gap: 12px; }
+  .option-btn { font-size: 17px; padding: 17px 10px; min-height: 56px; }
+  .header h1 { font-size: 28px; letter-spacing: 5px; }
+  .level-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+}
 </style>
 </head>
 <body>
 
 <div class="container" id="app">
-  <!-- 顶部 -->
+  <!-- 顶部栏 -->
   <div class="header">
-    <h1><span>🌿</span> 植物猜猜猜</h1>
+    <h1><i class="icon">🌿</i>植物猜猜猜</h1>
     <div class="stats">
-      <div class="stat-item">⭐ <span class="stat-value" id="score">0</span> 分</div>
-      <div class="stat-item">📷 <span id="progress">1</span>/<span id="total">0</span></div>
+      <div class="stat-item">📗 第 <span class="stat-highlight" id="currentLevelDisplay">1</span>/<span id="totalLevelsDisplay">?</span> 关</div>
+      <div class="stat-item">⭐ <span class="stat-value" id="levelScore">0</span></div>
+      <div class="stat-item">📷 <span class="stat-highlight" id="levelProgress">0</span>/<span id="levelProgressTotal">0</span></div>
     </div>
   </div>
 
   <!-- 图片区 -->
   <div class="image-area" id="imageArea">
     <div class="image-placeholder" id="placeholder">
-      <span class="icon">🌱</span>点击下方选项开始游戏
+      <span class="ph-icon">🍃</span>
     </div>
     <img id="plantImage" src="" alt="植物图片" class="loading" style="display:none">
     <div class="result-banner" id="resultBanner"></div>
@@ -314,45 +717,78 @@
     </div>
   </div>
 
-  <!-- 下一题 -->
+  <!-- 下一题按钮区 -->
   <div class="next-area">
-    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 ➜</button>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 ›</button>
   </div>
 
-  <!-- 完成面板 -->
-  <div class="finish-panel" id="finishPanel">
-    <span class="icon">🎉</span>
-    <h2>全部答完！</h2>
-    <div class="score-final" id="finalScore">0</div>
-    <p>总分</p>
-    <button class="restart-btn" onclick="restartGame()">🔄 再玩一次</button>
+  <!-- 关卡介绍覆盖层 -->
+  <div class="level-intro-overlay" id="levelIntroOverlay">
+    <div class="level-intro-content">
+      <div class="level-intro-deco"></div>
+      <div class="level-intro-num" id="levelIntroNum">第 1 关</div>
+      <div class="level-intro-sub" id="levelIntroSub">共 10 题</div>
+      <div class="level-intro-deco-bottom"></div>
+      <div class="level-intro-hint">轻触任意处开始</div>
+    </div>
+  </div>
+
+  <!-- 关卡完成面板 -->
+  <div class="level-complete-panel" id="levelCompletePanel">
+    <div class="lc-icon">📋</div>
+    <h2>第 <span id="lcLevelNum">1</span> 关完成</h2>
+    <div class="stars-display" id="levelStarsDisplay">
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+    </div>
+    <p class="level-result-text" id="levelResultText">答对 0/10 题</p>
+    <button class="lc-btn" id="nextLevelBtn" onclick="nextLevel()">下一关 ›</button>
+  </div>
+
+  <!-- 全部通关面板 -->
+  <div class="all-complete-panel" id="allCompletePanel">
+    <div class="ac-icon">🏆</div>
+    <h2>全部通关</h2>
+    <div class="level-grid" id="levelGrid"></div>
+    <p class="total-score-text" id="totalScoreText"></p>
+    <button class="ac-btn" onclick="restartGame()">🔄 再玩一次</button>
   </div>
 
   <!-- 错误提示 -->
   <div class="error-state" id="errorState">
-    <span class="icon">😢</span>
+    <span class="err-icon">😢</span>
     <p>无法加载植物数据，<br>请确保 plant_data.js 文件存在</p>
   </div>
 </div>
 
 <script src="plant_data.js"></script>
 <script>
-// ==================== 游戏逻辑 ====================
+// ==================== 植物猜猜猜 — 闯关模式 ====================
 (function() {
+  var QUESTIONS_PER_LEVEL = 10;
+
   var plants = [];
-  var usedImages = {};    // 记录已用图片: { "img/xxx/1.webp": true }
+  var usedImages = {};
   var currentPlant = null;
   var currentImage = null;
+
+  // 全局总分（跨关卡累加）
   var score = 0;
-  var questionCount = 0;
-  var totalImages = 0;
+
+  // 关卡相关
+  var currentLevel = 1;
+  var totalLevels = 0;
+  var levelQuestions = [];
+  var levelIndex = 0;
+  var levelScore = 0;
+  var levelIntroTimer = null;
   var answered = false;
 
-  // DOM 引用
+  // DOM
   var els = {};
   function $(id) { return document.getElementById(id); }
 
-  // 初始化 DOM 引用
   function initDom() {
     els.imageArea = $('imageArea');
     els.plantImage = $('plantImage');
@@ -360,17 +796,37 @@
     els.resultBanner = $('resultBanner');
     els.optionsGrid = $('optionsGrid');
     els.nextBtn = $('nextBtn');
-    els.score = $('score');
-    els.progress = $('progress');
-    els.total = $('total');
-    els.finishPanel = $('finishPanel');
-    els.finalScore = $('finalScore');
-    els.errorState = $('errorState');
-    els.app = $('app');
     els.optionsArea = $('optionsArea');
+    els.app = $('app');
+
+    // 头部新元素
+    els.currentLevelDisplay = $('currentLevelDisplay');
+    els.totalLevelsDisplay = $('totalLevelsDisplay');
+    els.levelScore = $('levelScore');
+    els.levelProgress = $('levelProgress');
+    els.levelProgressTotal = $('levelProgressTotal');
+
+    // 关卡介绍
+    els.levelIntroOverlay = $('levelIntroOverlay');
+    els.levelIntroNum = $('levelIntroNum');
+    els.levelIntroSub = $('levelIntroSub');
+
+    // 关卡完成
+    els.levelCompletePanel = $('levelCompletePanel');
+    els.levelStarsDisplay = $('levelStarsDisplay');
+    els.levelResultText = $('levelResultText');
+    els.nextLevelBtn = $('nextLevelBtn');
+    els.lcLevelNum = $('lcLevelNum');
+
+    // 全部通关
+    els.allCompletePanel = $('allCompletePanel');
+    els.levelGrid = $('levelGrid');
+    els.totalScoreText = $('totalScoreText');
+
+    els.errorState = $('errorState');
   }
 
-  // 加载数据
+  // ===== 数据加载 =====
   function loadData() {
     if (typeof PLANT_DATA === 'undefined') {
       els.errorState.classList.add('show');
@@ -379,14 +835,7 @@
     }
 
     plants = PLANT_DATA;
-    // 过滤掉没有图片的植物
     plants = plants.filter(function(p) { return p.images && p.images.length > 0; });
-
-    // 计算总图片数
-    totalImages = 0;
-    plants.forEach(function(p) {
-      totalImages += p.images.length;
-    });
 
     if (plants.length < 4) {
       els.errorState.classList.add('show');
@@ -394,43 +843,15 @@
       return false;
     }
 
-    els.total.textContent = totalImages;
+    var totalImages = 0;
+    plants.forEach(function(p) { totalImages += p.images.length; });
+    totalLevels = Math.ceil(totalImages / QUESTIONS_PER_LEVEL);
+    els.totalLevelsDisplay.textContent = totalLevels;
+
     return true;
   }
 
-  // 随机选植物
-  function pickRandomPlant() {
-    // 过滤掉所有图片都已用过的植物
-    var available = plants.filter(function(p) {
-      return p.images.some(function(img) { return !usedImages[img]; });
-    });
-
-    if (available.length === 0) return null;
-
-    var idx = Math.floor(Math.random() * available.length);
-    return available[idx];
-  }
-
-  // 从指定植物中选未用过的图片
-  function pickImage(plant) {
-    var fresh = plant.images.filter(function(img) { return !usedImages[img]; });
-    if (fresh.length === 0) return null;
-    var idx = Math.floor(Math.random() * fresh.length);
-    return fresh[idx];
-  }
-
-  // 生成 4 个选项（含正确答案）
-  function generateOptions(correctName) {
-    var others = plants.filter(function(p) { return p.name !== correctName; });
-    // 随机选 3 个
-    shuffle(others);
-    var distractors = others.slice(0, 3).map(function(p) { return p.name; });
-    var options = [correctName].concat(distractors);
-    shuffle(options);
-    return options;
-  }
-
-  // Fisher-Yates 洗牌
+  // ===== 工具函数 =====
   function shuffle(arr) {
     for (var i = arr.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
@@ -438,27 +859,132 @@
     }
   }
 
-  // 准备题目
+  function computeStars(correct, total) {
+    var pct = correct / total;
+    if (pct >= 0.9) return 3;
+    if (pct >= 0.7) return 2;
+    if (pct >= 0.5) return 1;
+    return 0;
+  }
+
+  function renderStarsHTML(count) {
+    var html = '';
+    for (var i = 0; i < 3; i++) {
+      var cls = (i < count) ? 'star filled' : 'star empty';
+      html += '<span class="' + cls + '">&#11088;</span>';
+    }
+    return html;
+  }
+
+  function generateOptions(correctName) {
+    var others = plants.filter(function(p) { return p.name !== correctName; });
+    shuffle(others);
+    var distractors = others.slice(0, 3).map(function(p) { return p.name; });
+    var options = [correctName].concat(distractors);
+    shuffle(options);
+    return options;
+  }
+
+  // ===== localStorage =====
+  var STORAGE_KEY = 'plant_guess_best_stars';
+
+  function loadBestStars() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) { return {}; }
+  }
+
+  function saveBestStars(level, stars) {
+    var best = loadBestStars();
+    var key = String(level);
+    if (best[key] === undefined || stars > best[key]) {
+      best[key] = stars;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(best)); } catch(e) {}
+    }
+  }
+
+  // ===== 关卡题目构建 =====
+  function buildLevelQuestions() {
+    var pool = [];
+    plants.forEach(function(p) {
+      p.images.forEach(function(img) {
+        if (!usedImages[img]) {
+          pool.push({ image: img, plant: p });
+        }
+      });
+    });
+    if (pool.length === 0) return [];
+    shuffle(pool);
+    return pool.slice(0, QUESTIONS_PER_LEVEL);
+  }
+
+  // ===== 头部更新 =====
+  function updateHeader() {
+    els.currentLevelDisplay.textContent = currentLevel;
+    els.levelScore.textContent = levelScore;
+    els.levelProgress.textContent = Math.min(levelIndex + 1, levelQuestions.length);
+    els.levelProgressTotal.textContent = levelQuestions.length;
+  }
+
+  // ===== 关卡介绍 =====
+  function showLevelIntro(n) {
+    els.levelIntroNum.textContent = '第 ' + n + ' 关';
+    els.levelIntroSub.textContent = '共 ' + levelQuestions.length + ' 题';
+    els.levelIntroOverlay.style.display = 'flex';
+    els.levelIntroOverlay.offsetHeight;
+    els.levelIntroOverlay.classList.add('show');
+
+    els.levelIntroOverlay.onclick = function() {
+      if (levelIntroTimer) clearTimeout(levelIntroTimer);
+      hideLevelIntro();
+    };
+
+    levelIntroTimer = setTimeout(function() {
+      hideLevelIntro();
+    }, 1600);
+  }
+
+  function hideLevelIntro() {
+    if (levelIntroTimer) clearTimeout(levelIntroTimer);
+    els.levelIntroOverlay.classList.remove('show');
+    els.levelIntroOverlay.onclick = null;
+    setTimeout(function() {
+      els.levelIntroOverlay.style.display = 'none';
+      prepareQuestion();
+    }, 380);
+  }
+
+  // ===== 关卡生命周期 =====
+  function startLevel(n) {
+    currentLevel = n;
+    levelQuestions = buildLevelQuestions();
+    levelIndex = 0;
+    levelScore = 0;
+
+    updateHeader();
+
+    els.levelCompletePanel.classList.remove('show');
+    els.allCompletePanel.classList.remove('show');
+    els.optionsArea.style.display = 'block';
+    els.placeholder.style.display = 'none';
+
+    showLevelIntro(n);
+  }
+
+  // ===== 题目准备 =====
   function prepareQuestion() {
-    var plant = pickRandomPlant();
-    if (!plant) {
-      showFinish();
+    if (levelIndex >= levelQuestions.length) {
+      showLevelComplete();
       return;
     }
 
-    var image = pickImage(plant);
-    if (!image) {
-      // 理论上不会到这，但防御一下
-      showFinish();
-      return;
-    }
+    var q = levelQuestions[levelIndex];
+    currentPlant = q.plant;
+    currentImage = q.image;
 
-    currentPlant = plant;
-    currentImage = image;
+    var options = generateOptions(currentPlant.name);
 
-    var options = generateOptions(plant.name);
-
-    // 更新 UI
     answered = false;
     els.nextBtn.classList.remove('show');
     els.resultBanner.classList.remove('show', 'correct', 'wrong');
@@ -475,7 +1001,7 @@
     };
     els.plantImage.onerror = function() {
       els.plantImage.style.display = 'none';
-      els.placeholder.innerHTML = '<span class="icon">🖼️</span>图片加载失败';
+      els.placeholder.innerHTML = '<span class="ph-icon">🖼️</span>图片加载失败';
       els.placeholder.style.display = 'block';
     };
 
@@ -488,12 +1014,10 @@
       btn.onclick = function() { handleAnswer(options[i], btn); };
     });
 
-    questionCount++;
-    els.progress.textContent = questionCount;
-    els.total.textContent = totalImages;
+    updateHeader();
   }
 
-  // 处理用户回答
+  // ===== 处理回答 =====
   function handleAnswer(selected, btn) {
     if (answered) return;
     answered = true;
@@ -501,7 +1025,6 @@
     var correctName = currentPlant.name;
     var isCorrect = (selected === correctName);
 
-    // 标记使用过的图片
     usedImages[currentImage] = true;
 
     // 禁用所有按钮
@@ -515,87 +1038,168 @@
       }
     });
 
-    // 如果选错，高亮错误选项
+    // 高亮错误选项
     if (!isCorrect) {
       btn.classList.add('wrong-answer');
     } else {
       score++;
-      els.score.textContent = score;
+      levelScore++;
     }
 
-    // 显示结果横幅
+    // 更新头部
+    els.levelScore.textContent = levelScore;
+
+    // 结果横幅
     var banner = els.resultBanner;
     if (isCorrect) {
-      banner.textContent = '✅ 回答正确！';
+      banner.textContent = '✓ 回答正确';
       banner.className = 'result-banner correct show';
     } else {
-      banner.textContent = '❌ 正确答案：' + correctName;
+      banner.textContent = '✗ 正确答案：' + correctName;
       banner.className = 'result-banner wrong show';
     }
 
-    // 显示下一题按钮
+    // 显示下一题
     els.nextBtn.classList.add('show');
     els.nextBtn.focus();
   }
 
-  // 下一题
+  // ===== 下一题 =====
   window.nextQuestion = function() {
-    // 检查是否全部答完
-    var available = plants.filter(function(p) {
-      return p.images.some(function(img) { return !usedImages[img]; });
-    });
-    if (available.length === 0 || questionCount >= totalImages) {
-      showFinish();
+    levelIndex++;
+    if (levelIndex >= levelQuestions.length) {
+      showLevelComplete();
       return;
     }
     prepareQuestion();
   };
 
-  // 显示完成面板
-  function showFinish() {
+  // ===== 关卡完成 =====
+  function showLevelComplete() {
+    var total = levelQuestions.length;
+    var stars = computeStars(levelScore, total);
+
+    saveBestStars(currentLevel, stars);
+
+    // 隐藏游戏元素
     els.plantImage.style.display = 'none';
     els.placeholder.style.display = 'none';
     els.optionsArea.style.display = 'none';
     els.nextBtn.classList.remove('show');
     els.resultBanner.classList.remove('show');
-    els.finalScore.textContent = score;
-    els.finishPanel.classList.add('show');
-    els.progress.textContent = questionCount;
+
+    // 显示关卡完成面板
+    els.lcLevelNum.textContent = currentLevel;
+    els.levelStarsDisplay.innerHTML = renderStarsHTML(stars);
+    els.levelResultText.textContent = '答对 ' + levelScore + ' / ' + total + ' 题';
+    els.levelCompletePanel.classList.add('show');
+
+    // 按钮文案
+    if (currentLevel >= totalLevels) {
+      els.nextLevelBtn.textContent = '查看总成绩 ›';
+    } else {
+      els.nextLevelBtn.textContent = '下一关 ›';
+    }
   }
 
-  // 重新开始
+  // ===== 下一关 =====
+  window.nextLevel = function() {
+    currentLevel++;
+    if (currentLevel > totalLevels) {
+      showAllComplete();
+      return;
+    }
+    startLevel(currentLevel);
+  };
+
+  // ===== 全部通关 =====
+  function showAllComplete() {
+    els.plantImage.style.display = 'none';
+    els.placeholder.style.display = 'none';
+    els.optionsArea.style.display = 'none';
+    els.nextBtn.classList.remove('show');
+    els.resultBanner.classList.remove('show');
+    els.levelCompletePanel.classList.remove('show');
+
+    var bestStars = loadBestStars();
+    var gridHtml = '';
+    var totalStars = 0;
+
+    for (var i = 1; i <= totalLevels; i++) {
+      var s = bestStars[String(i)];
+      if (s === undefined) s = -1; // 未玩过的关卡
+      else totalStars += s;
+
+      var cls, starStr;
+      if (s === -1) {
+        cls = 'level-bubble best-0';
+        starStr = '—';
+      } else {
+        cls = 'level-bubble best-' + s;
+        starStr = '';
+        for (var j = 0; j < 3; j++) {
+          starStr += (j < s) ? '⭐' : '<span class="empty-star">⭐</span>';
+        }
+      }
+
+      gridHtml += '<div class="' + cls + '">' +
+        '<div class="bubble-num">第' + i + '关</div>' +
+        '<div class="bubble-stars">' + starStr + '</div>' +
+        '</div>';
+    }
+    els.levelGrid.innerHTML = gridHtml;
+
+    var totalImages = 0;
+    plants.forEach(function(p) { totalImages += p.images.length; });
+
+    els.totalScoreText.innerHTML =
+      '累计得分 <b>' + score + '</b> / ' + totalImages +
+      '<br>累计获得 ⭐ <b>' + totalStars + '</b> / ' + (totalLevels * 3);
+
+    els.allCompletePanel.classList.add('show');
+  }
+
+  // ===== 重新开始 =====
   window.restartGame = function() {
     usedImages = {};
     currentPlant = null;
     currentImage = null;
     score = 0;
-    questionCount = 0;
+    levelScore = 0;
+    levelIndex = 0;
+    levelQuestions = [];
+    currentLevel = 1;
     answered = false;
 
-    els.score.textContent = '0';
-    els.progress.textContent = '1';
+    if (levelIntroTimer) clearTimeout(levelIntroTimer);
+
+    els.levelCompletePanel.classList.remove('show');
+    els.allCompletePanel.classList.remove('show');
+    els.levelIntroOverlay.classList.remove('show');
+    els.levelIntroOverlay.style.display = 'none';
+
+    els.optionsArea.style.display = 'block';
     els.plantImage.style.display = 'none';
     els.placeholder.style.display = 'block';
-    els.placeholder.innerHTML = '<span class="icon">🌱</span>点击下方选项开始游戏';
-    els.finishPanel.classList.remove('show');
-    els.optionsArea.style.display = 'block';
+    els.placeholder.innerHTML = '<span class="ph-icon">🍃</span>';
     els.resultBanner.classList.remove('show', 'correct', 'wrong');
     els.nextBtn.classList.remove('show');
 
-    // 重置按钮
     var buttons = els.optionsGrid.querySelectorAll('.option-btn');
     buttons.forEach(function(btn) {
       btn.className = 'option-btn';
       btn.textContent = '';
     });
 
-    prepareQuestion();
+    updateHeader();
+    startLevel(1);
   };
 
   // ===== 启动 =====
   initDom();
   if (loadData()) {
-    prepareQuestion();
+    updateHeader();
+    startLevel(1);
   }
 })();
 </script>
